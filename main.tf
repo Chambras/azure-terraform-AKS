@@ -10,9 +10,9 @@ terraform {
     }
   }
 */
-  required_version = ">= 0.14.6"
+  required_version = "= 0.14.6"
   required_providers {
-    version = "=2.47.0"
+    azurerm = "=2.47.0"
   }
 }
 
