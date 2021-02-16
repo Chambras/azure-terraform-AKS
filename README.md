@@ -2,10 +2,9 @@
 
 It creates:
 
-* A new Resource Group.
-* A VNet with 2 subnets.
-* A Route table.
-* An AKS Cluster.
+- A new Resource Group.
+- A VNet with 2 subnets.
+- An AKS Cluster.
 
 ## Project Structure
 
@@ -16,13 +15,20 @@ This project has the following files which make them easy to reuse, add or remov
 ├── LICENSE
 ├── README.md
 ├── aks.tf
+├── helmExample
+│   ├── main.tf
+│   └── variables.tf
+├── kubernetesExample
+│   ├── main.tf
+│   └── variables.tf
 ├── main.tf
 ├── networking.tf
 ├── outputs.tf
+├── terraform.tfvars
 └── variables.tf
 ```
 
-Most common paremeters are exposed as variables in _`variables.tf`_
+Most common parameters are exposed as variables in _`variables.tf`_
 In order to get supported k8s versions by region you can use this command
 
 ```ssh
@@ -34,15 +40,25 @@ az aks get-versions -l {{location}}
 It is assumed that you have azure CLI and Terraform installed and configured.
 More information on this topic [here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-install-configure). I recommend using a Service Principal with a certificate.
 
+It also assumes you have _`kubectl`_ installed and configured.
+More information on this topic [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+
+It is recommended to have helm installed as well. You can find more information [here](https://helm.sh/docs/intro/install/).
+
 ### versions
 
-* Terraform =>0.12.16
-* Azure provider 1.37.0
-* Azure CLI 2.0.77
+- Terraform >= 0.14.6
+- Azure provider 2.47.0
+- Helm Provider 2.0.2
+- Kubernetes Provider 2.0.2
+- Azure CLI 2.19.1
+- helm >= 3.0.0
+- kubectl >= 1.18.15
 
 ### Service Principal
 
-AKS also requires a sesrvice principal in order to manage the cluster. It is assumed that you already have a Service Principal already created and you can configure those using `kubernetes_client_id` and `kubernetes_client_secret` located in _`variables.tf`_.
+This demo has been updated to use a _`SystemAssigned`_ identity, but AKS also gives you the option to use a service principal in order to manage the cluster.
+It is assumed that you already have a Service Principal already created and you can configure it using `kubernetes_client_id` and `kubernetes_client_secret` located in _`variables.tf`_.
 
 You can create a Service Principal using the following command
 
@@ -85,10 +101,23 @@ Once the cluster is up and running you can execute the following command in orde
 az aks get-credentials -g {{ResourceGroupName}} -n {{AKSClusterName}}
 ```
 
-once executed you should be able to interact with thte cluster usng `kubectl`
+once executed you should be able to interact with the cluster using `kubectl`
 
 ```ssh
 kubectl get nodes
+```
+
+Alternatively you can use this command to get some tips on how to configure your _`kubectl`_ using a custom file. This is sample output:
+
+```ssh
+terraform output configure
+
+<<EOT
+Run the following commands to configure kubernetes client:
+$ terraform output kube_config > ~/.kube/aksconfig
+$ export KUBECONFIG=~/.kube/aksconfig
+Test configuration using kubectl
+$ kubectl get nodes
 ```
 
 ## Clean resources
@@ -105,4 +134,4 @@ Be aware that by running this script your account might get billed.
 
 ## Authors
 
-* Marcelo Zambrana
+- Marcelo Zambrana

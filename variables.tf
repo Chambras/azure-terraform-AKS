@@ -5,11 +5,11 @@ variable "location" {
 }
 
 variable "suffix" {
-  default = "aksdemo"
+  default = "MZV"
 }
 
 variable "tags" {
-  type = map
+  type = map(any)
   default = {
     "Environment" = "Dev"
     "Project"     = "Demo"
@@ -20,7 +20,7 @@ variable "tags" {
 
 variable "rgName" {
   type        = string
-  default     = "genericRG"
+  default     = "AKSRG"
   description = "Resource Group Name."
 }
 
@@ -28,6 +28,7 @@ variable "ssh_public_key" {
   type        = string
   default     = "~/.ssh/vm_ssh.pub"
   description = "The Path at which your Public SSH Key is located. Defaults to ~/.ssh/vm_ssh.pub"
+  sensitive   = true
 }
 
 ## AKS variables
@@ -39,7 +40,7 @@ variable "cluster_name" {
 
 variable "k8sVersion" {
   type        = string
-  default     = "1.15.4"
+  default     = "1.18.14"
   description = "Kubernetes version to use."
 
 }
@@ -58,20 +59,20 @@ variable "agent_count" {
 
 variable "kubernetes_client_id" {
   type        = string
-  default     = "SP_CLIENT_ID"
+  default     = ""
   description = "The Client ID for the Service Principal to use for this Managed Kubernetes Cluster"
 }
 
 variable "kubernetes_client_secret" {
   type        = string
-  default     = "SP_CLIENT_SECRET"
+  default     = ""
   description = "The Client Secret for the Service Principal to use for this Managed Kubernetes Cluster"
 }
 
 ## Networking variables
 variable "vnetName" {
   type        = string
-  default     = "Vnet"
+  default     = "AKSVNet"
   description = "VNet name."
 }
 
@@ -83,7 +84,7 @@ variable "sgName" {
 }
 
 variable "sourceIPs" {
-  type        = list
-  default     = ["173.66.39.236", "152.120.199.10", "167.220.148.25"]
+  type        = list(any)
+  default     = ["173.66.216.193"]
   description = "Public IPs to allow inboud communications."
 }

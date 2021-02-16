@@ -1,0 +1,99 @@
+# Helm Provider with AKS
+
+This is sample deployment that uses [Helm terraform provider](https://registry.terraform.io/providers/hashicorp/helm/latest) to deploy Nginx helm chart into AKS. It creates:
+
+- A New Namespace (helmnginx by default).
+- A Deployment.
+- A Load Balancer service.
+
+## Project Structure
+
+This project has the following files which make them easy to reuse, add or remove.
+
+```ssh
+.
+├── README.md
+├── main.tf
+└── variables.tf
+```
+
+Most common parameters are exposed as variables in _`variables.tf`_
+
+## Pre-requisites
+
+It is assumed that you have azure CLI and Terraform installed and configured.
+More information on this topic [here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-install-configure). I recommend using a Service Principal with a certificate.
+
+It also assumes you have _`kubectl`_ installed and configured.
+More information on this topic [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+
+It is recommended to have helm installed as well. You can find more information [here](https://helm.sh/docs/intro/install/).
+
+### versions
+
+- Terraform >= 0.14.6
+- Azure provider 2.47.0
+- Helm Provider 2.0.2
+- Kubernetes Provider 2.0.2
+- Azure CLI 2.19.1
+- helm >= 3.0.0
+- kubectl >= 1.18.15
+
+## Authentication
+
+This providers has multiple ways to authenticate with Kubernetes and you can take a look at them [here.](https://registry.terraform.io/providers/hashicorp/helm/latest/docs#authentication)
+
+This example could use the Static TLS certificate credentials that are present in Azure AKS clusters by default, and can be used with the [azurerm_kubernetes_cluster](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/kubernetes_cluster) data source. This will automatically read the certificate information from the AKS cluster and pass it to the Helm provider, but just to show case another authentication option is using the [File config](https://registry.terraform.io/providers/hashicorp/helm/latest/docs#file-config) approach.
+
+## Usage
+
+Just run these commands to initialize terraform, get a plan and approve it to apply it.
+
+```ssh
+terraform fmt
+terraform init
+terraform validate
+terraform plan
+terraform apply
+```
+
+I also recommend using a remote state instead of a local one. You can change this configuration in _`main.tf`_
+You can create a free Terraform Cloud account [here](https://app.terraform.io).
+
+Once the cluster is up and running you can execute the following command in order to configure kubectl to connect to your cluster.
+
+```ssh
+az aks get-credentials -g {{ResourceGroupName}} -n {{AKSClusterName}}
+```
+
+once executed you should be able to interact with the cluster using `kubectl`
+
+```ssh
+kubectl get nodes
+```
+
+This command will give you the EXTERNAL-IP that you can use to test it. You should see the Nginx Welcome screen.
+
+```ssh
+kubecetl get services -n nginx
+
+NAME                             TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                      AGE
+nginx-ingress-controller         LoadBalancer   10.0.112.6     52.253.74.127   80:30719/TCP,443:30623/TCP   44m
+
+```
+
+## Clean resources
+
+It will destroy everything that was created.
+
+```ssh
+terraform destroy --force
+```
+
+## Caution
+
+Be aware that by running this script your account might get billed.
+
+## Authors
+
+- Marcelo Zambrana
